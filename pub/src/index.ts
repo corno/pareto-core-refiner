@@ -22,3 +22,24 @@ export {
     au,
     ss,
 } from "pareto-core-internals"
+
+
+type Dictionary_Builder<T> = {
+    'add entry': (key: string, value: T) => void
+}
+
+export const deprecated_build_dictionary = <T>(
+    $: ($c: Dictionary_Builder<T>) => void
+): _pi.Dictionary<T> => {
+    const temp: { [key: string]: T } = {}
+    $({
+        'add entry': (key, $) => {
+            if (key in temp) {
+                _pinternals.panic(`duplicate key in dictionary literal: ${key}`)
+            }
+            temp[key] = $
+        }
+    })
+    return _pinternals.dictionary_literal(temp)
+}
+
