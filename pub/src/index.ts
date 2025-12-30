@@ -16,6 +16,7 @@ export {
     cc as deprecated_cc,
     panic as fixme_abort,
 
+    list_to_dictionary,
 
     cc,
     au,
