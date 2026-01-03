@@ -11,7 +11,7 @@ namespace i {
         | ['error', ['circular', _pi.List<string>]]
         | ['resolved', T]
 
-    export type Lookup<T> = { get_entry: (key: string) => _pi.Optional_Value<T> }
+    export type Lookup<T> = { get_possible_entry: (key: string) => _pi.Optional_Value<T> }
     export type Acyclic_Lookup<T> = _pi.Optional_Value<Lookup<Non_Circular_Result<T>>> //FIXME should this not be optional?
 
     export type Possibly_Circular_Result<T> = _pi.Circular_Dependency<T>
@@ -184,7 +184,7 @@ export const dictionary_to_lookup = <T>(
     $: _pi.Dictionary<T>,
     $p: null,
 ): i.Acyclic_Lookup<T> => {
-    return _pinternals.set($.map(($) => (['resolved', $])))
+    return _pinternals.set($.map(($): i.Non_Circular_Result<T> => (['resolved', $])))
 }
 
 export const get_possibly_circular_dependent_sibling_entry = <Source, T>(
@@ -197,7 +197,7 @@ export const get_possibly_circular_dependent_sibling_entry = <Source, T>(
     return $.transform(
         ($) => ({
             'key': $p.reference.key,
-            'entry': $.get_entry($p.reference.key).transform(
+            'entry': $.get_possible_entry($p.reference.key).transform(
                 ($) => $,
                 () => abort($p.reference.location, ['no such entry', { 'key': $p.reference.key }], $p['location 2 string']),
             )
@@ -225,11 +225,11 @@ export const get_entry_from_stack = <Source, T>(
     const get_entry_from_stack = (
         up_steps_taken: number
     ): resolved$.Reference_To_Stacked_Dictionary_Entry<Source, T> => {
-        return $.__get_element_at($.get_number_of_elements() - 1 - up_steps_taken).transform(
+        return $.__get_possible_element_at($.get_number_of_elements() - 1 - up_steps_taken).transform(
             ($): resolved$.Reference_To_Stacked_Dictionary_Entry<Source, T> => {
                 return $.transform(
                     ($) => {
-                        return $.get_entry(ref.key).transform(
+                        return $.get_possible_entry(ref.key).transform(
                             ($) => _pinternals.cc($, ($) => {
                                 switch ($[0]) {
                                     case 'error': return _pinternals.ss($, ($) => get_entry_from_stack(up_steps_taken += 1))
@@ -264,7 +264,7 @@ export const get_entry = <Source, T>(
     return $.transform(
         ($) => ({
             'key': $p.reference.key,
-            'entry': $.get_entry($p.reference.key).transform(
+            'entry': $.get_possible_entry($p.reference.key).transform(
                 ($) => _pinternals.cc($, ($) => {
                     switch ($[0]) {
                         case 'error': return _pinternals.ss($, ($) => _pinternals.cc($, ($) => {
@@ -367,7 +367,7 @@ export const resolve_dense_ordered_dictionary = <Source, TUnresolved, TResolved,
         ) => {
             benchmark.map(($, key) => {
                 const benchmark = $
-                focus.get_entry(key).transform(
+                focus.get_possible_entry(key).transform(
                     ($) => {
                     },
                     () => {
@@ -429,9 +429,9 @@ export const resolve_ordered_dictionary = <Source, TUnresolved, TResolved>(
                 'location': location,
             }, {
                 'possibly circular dependent siblings': _pinternals.set({
-                    get_entry(key) {
+                    get_possible_entry(key) {
                         //does the entry exist?
-                        return source_dictionary.dictionary.get_entry(key).map(($) => {
+                        return source_dictionary.dictionary.get_possible_entry(key).map(($) => {
                             //yes, it exists in the source dictionary
                             if (all_siblings_subscribed_entries[key] === undefined) {
                                 all_siblings_subscribed_entries[key] = { 'entry': null }
@@ -451,10 +451,10 @@ export const resolve_ordered_dictionary = <Source, TUnresolved, TResolved>(
 
                 }),
                 'not circular dependent siblings': _pinternals.set({
-                    get_entry(key): _pi.Optional_Value<i.Non_Circular_Result<TResolved>> {
+                    get_possible_entry(key): _pi.Optional_Value<i.Non_Circular_Result<TResolved>> {
                         const status = status_dictionary[key]
                         if (status === undefined) {
-                            return source_dictionary.dictionary.get_entry(key).transform(
+                            return source_dictionary.dictionary.get_possible_entry(key).transform(
                                 ($) => _pinternals.set(['resolved', process_entry($.entry, $.location, key)]),
                                 () => {
                                     return _pinternals.not_set()
