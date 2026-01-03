@@ -163,7 +163,7 @@ export const abort = <Source>(location: Source, type: Resolve_Error_Type, locati
                 case 'no such entry': return _pinternals.ss($, ($) => `no such entry: '${$['key']}'`)
                 case 'missing denseness entry': return _pinternals.ss($, ($) => `missing denseness entry: '${$['key']}'`)
                 case 'circular dependency': return _pinternals.ss($, ($) => {
-                    const keys = _pinternals.build_text(($i) => {
+                    const keys = _pinternals.text_build(($i) => {
                         $['keys'].__for_each(($) => {
                             $i['add snippet'](` '${$}', `)
                         })
@@ -184,7 +184,7 @@ export const dictionary_to_lookup = <T>(
     $: _pi.Dictionary<T>,
     $p: null,
 ): i.Acyclic_Lookup<T> => {
-    return _pinternals.set($.map(($): i.Non_Circular_Result<T> => (['resolved', $])))
+    return _pinternals.optional_set($.map(($): i.Non_Circular_Result<T> => (['resolved', $])))
 }
 
 export const get_possibly_circular_dependent_sibling_entry = <Source, T>(
@@ -207,7 +207,7 @@ export const get_possibly_circular_dependent_sibling_entry = <Source, T>(
 }
 
 export const push_stack = <T>($: _pi.List<T>, $p: { 'element': T }): _pi.List<T> => {
-    return _pinternals.build_list<T>(($i) => {
+    return _pinternals.list_build<T>(($i) => {
         $i['add list']($)
         $i['add element']($p['element'])
     })
@@ -303,7 +303,7 @@ export const resolve_path = <Source, Unresolved_Element, Resolved_Element, Seed>
     }
     $.list.__for_each(($) => {
         const result = $p.map($.element, current.result.data)
-        const data = _pinternals.build_list<Resolved_Element>(($i) => {
+        const data = _pinternals.list_build<Resolved_Element>(($i) => {
             current.list.__for_each(($) => {
                 $i['add element']($)
             })
@@ -410,7 +410,7 @@ export const resolve_ordered_dictionary = <Source, TUnresolved, TResolved>(
 
     const finished: { [key: string]: TResolved } = {}
 
-    const ordered_list = _pinternals.build_list<_pi.Deprecated_Key_Value_Pair<TResolved>>(($i) => {
+    const ordered_list = _pinternals.list_build<_pi.Deprecated_Key_Value_Pair<TResolved>>(($i) => {
 
         const source_dictionary = $
 
@@ -428,7 +428,7 @@ export const resolve_ordered_dictionary = <Source, TUnresolved, TResolved>(
                 'value': $,
                 'location': location,
             }, {
-                'possibly circular dependent siblings': _pinternals.set({
+                'possibly circular dependent siblings': _pinternals.optional_set({
                     get_possible_entry(key) {
                         //does the entry exist?
                         return source_dictionary.dictionary.get_possible_entry(key).map(($) => {
@@ -450,20 +450,20 @@ export const resolve_ordered_dictionary = <Source, TUnresolved, TResolved>(
                     },
 
                 }),
-                'not circular dependent siblings': _pinternals.set({
+                'not circular dependent siblings': _pinternals.optional_set({
                     get_possible_entry(key): _pi.Optional_Value<i.Non_Circular_Result<TResolved>> {
                         const status = status_dictionary[key]
                         if (status === undefined) {
                             return source_dictionary.dictionary.get_possible_entry(key).transform(
-                                ($) => _pinternals.set(['resolved', process_entry($.entry, $.location, key)]),
+                                ($) => _pinternals.optional_set(['resolved', process_entry($.entry, $.location, key)]),
                                 () => {
-                                    return _pinternals.not_set()
+                                    return _pinternals.optional_not_set()
                                     // throw new ResolveError("")
                                 }
                             )
                         } else {
                             const get_keys_of_entries_being_processed = () => {
-                                return _pinternals.build_list<string>(($i) => {
+                                return _pinternals.list_build<string>(($i) => {
                                     _pinternals.dictionary_literal(status_dictionary).map(($, key) => {
                                         if ($[0] === 'processing') {
                                             $i['add element'](key)
@@ -482,7 +482,7 @@ export const resolve_ordered_dictionary = <Source, TUnresolved, TResolved>(
 
 
 
-                                            return _pinternals.set(['error', ['circular', get_keys_of_entries_being_processed()]])
+                                            return _pinternals.optional_set(['error', ['circular', get_keys_of_entries_being_processed()]])
                                             //return notSet()
                                         })
                                     case 'processing':
@@ -498,10 +498,10 @@ export const resolve_ordered_dictionary = <Source, TUnresolved, TResolved>(
                                             //$se.onError(`the following entries are referencing each other: ${keys.join(", ")}`)
                                         }
                                         status_dictionary[key_of_entry_being_processed] = ['failed', null]
-                                        return _pinternals.set(['error', ['circular', get_keys_of_entries_being_processed()]])
+                                        return _pinternals.optional_set(['error', ['circular', get_keys_of_entries_being_processed()]])
 
                                     case 'success':
-                                        return _pinternals.set(['resolved', s[1]])
+                                        return _pinternals.optional_set(['resolved', s[1]])
                                     default: return _pinternals.au(s[0])
                                 }
                             })

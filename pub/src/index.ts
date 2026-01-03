@@ -6,17 +6,17 @@ import * as _pi from 'pareto-core-interface'
  */
 export {
     block,
-    build_list,
-    build_dictionary,
-    create_iterator,
+    list_build,
+    dictionary_build,
+    iterate,
     dictionary_literal,
     list_literal,
-    not_set,
-    set,
+    optional_not_set,
+    optional_set,
     cc as deprecated_cc,
     panic as fixme_abort,
 
-    list_to_dictionary,
+    dictionary_from_list,
 
     cc,
     au,
