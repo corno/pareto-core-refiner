@@ -6,8 +6,10 @@ import * as _pi from 'pareto-core-interface'
  */
 export {
     block,
-    iterate,
-    cc as deprecated_cc,
+
+    iterate_partially,
+    iterate_fully,
+
     panic as fixme_abort,
 
     cc,
