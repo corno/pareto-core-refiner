@@ -1,6 +1,6 @@
 {
   "name": "pareto-core-refiner",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "license": "ISC",
   "description": "the exupery core package for developing refiner algorithms",
   "author": "Corno",
