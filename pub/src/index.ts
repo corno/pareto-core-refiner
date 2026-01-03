@@ -6,22 +6,36 @@ import * as _pi from 'pareto-core-interface'
  */
 export {
     block,
-    list_build,
-    dictionary_build,
     iterate,
-    dictionary_literal,
-    list_literal,
-    optional_not_set,
-    optional_set,
     cc as deprecated_cc,
     panic as fixme_abort,
-
-    dictionary_from_list,
 
     cc,
     au,
     ss,
 } from "pareto-core-internals"
+
+
+export namespace optional {
+
+    export const set = _pinternals.optional_set
+    export const not_set = _pinternals.optional_not_set
+}
+
+export namespace list {
+
+    export const literal = _pinternals.list_literal
+    export const build = _pinternals.list_build
+
+}
+
+export namespace dictionary {   
+
+    export const literal = _pinternals.dictionary_literal
+    export const build = _pinternals.dictionary_build
+    export const from_list = _pinternals.dictionary_from_list
+
+}
 
 
 type Dictionary_Builder<T> = {
